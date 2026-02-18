@@ -1,0 +1,54 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+
+  "logo": {
+    "type": "kitty",
+    "source": "/home/ori/Downloads/0df86c72f70f0051642f7f325a382a82-removebg-preview.png",
+    "width": 30
+  },
+
+  "display": {
+    "color": "38;5;88"
+  },
+
+
+
+  "modules": [
+    {
+      "type": "custom",
+      "format": "\u001b[38;5;88m"
+    },
+    "title",
+    "separator",
+    "os",
+    "host",
+    "kernel",
+    "uptime",
+    "packages",
+    "shell",
+    "display",
+    "de",
+    "wm",
+    "wmtheme",
+    "theme",
+    "icons",
+    "font",
+    "cursor",
+    "terminal",
+    "terminalfont",
+    "cpu",
+    "gpu",
+    "memory",
+    "swap",
+    "disk",
+    "localip",
+    "battery",
+    "poweradapter",
+    "locale",
+    "break",
+    {"type":"custom","format":"\u001b[38;5;88m\n\n\n\nThere was once a tiger-striped cat.\nThis cat died a million deaths, and lived a million lives,\nand in those lives, various people owned him.\nNone of those people he cared for.\nThis cat was not afraid of death.\nOne life, the cat became a stray cat, which meant it was free.\nAnd it met a \u001b[38;5;15mwhite female cat\u001b[38;5;88m.\nThey became mates, and lived together.\nTime passed, the \u001b[38;5;15mwhite cat\u001b[38;5;88m passed away of old age.\nAnd the tiger-striped cat cried a million times.\nEventually, the cat died again.\nBut this time, it didn't come back to life.🥀\n\u001b[38;5;196m\u001b[0m"},
+    "break",
+    "colors"
+  ]
+}
+

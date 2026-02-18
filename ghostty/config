@@ -27,7 +27,8 @@ background-blur = true
 # ======
 
 
-theme = GitHub-Dark-Default
+theme = Catppuccin Frappe
+
 
 # Config syntax crash course
 # ==========================
