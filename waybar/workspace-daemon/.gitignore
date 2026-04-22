@@ -1,0 +1,26 @@
+# Rust / Cargo
+/target/
+
+# `cargo doc` (if generated at crate root)
+/doc/
+
+# Backup / tooling
+**/*.rs.bk
+*.pdb
+
+# Profiling / coverage
+*.profraw
+*.profdata
+coverage/
+
+# Local env overrides (optional secrets)
+.env
+.env.*
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*~
+
+# Keep lockfile for this app (binary + cdylib); do not ignore Cargo.lock
