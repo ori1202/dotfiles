@@ -1,0 +1,1 @@
+/home/ori/.config/waybar/workspace-daemon/target/release/libwaybar_hypr_ws.rlib: /home/ori/.config/waybar/workspace-daemon/src/abbrev.rs /home/ori/.config/waybar/workspace-daemon/src/hypr_common.rs /home/ori/.config/waybar/workspace-daemon/src/lib.rs

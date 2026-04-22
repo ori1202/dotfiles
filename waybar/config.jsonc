@@ -2,13 +2,13 @@
 {
     // "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar position (top|bottom|left|right)
-    "height": 30, // Waybar height (to be removed for auto height)
+    "height": 26,
     // "width": 1280, // Waybar width
-    "spacing": 4, // Gaps between modules (4px)
+    "spacing": 2,
     // Choose the order of the modules
     "modules-left": [
 	"custom/lframe",
-        "hyprland/workspaces",
+        "cffi/hypr-ws-tabs",
 	"custom/rframe"
 	//"custom/now-playing"
     ],
@@ -29,24 +29,14 @@
         "tray"
     ],
     // Modules configuration
-     "hyprland/workspaces": {
-	"disable-scroll": true,
-        "all-outputs": true,
-        "warp-on-scroll": false,
-       	"format": "{icon}",
-	"format-icons": {
-	"1": "⚀",
-    	"2": "⚁",
-    	"3": "⚂",
-    	"4": "⚃",
-	"5": "⚄",
-	"6": "⚅",
-	"urgent": "",
-        "focused": "",
-	"default": ""
-         }
-     },
-     
+    // Native GTK workspace tabs (Hyprland IPC + event socket inside the .so). Rebuild after changes:
+    //   cd ~/.config/waybar/workspace-daemon && cargo build --release
+    // Waybar must be built with CFFI support; module ABI matches waybar-cffi-rs rev in Cargo.toml.
+    "cffi/hypr-ws-tabs": {
+        "module_path": "/home/ori/.config/waybar/workspace-daemon/target/release/libwaybar_hypr_ws.so",
+        "max-tabs": 16
+    },
+
     "hyprland/scratchpad": {
         "format": "{icon} {count}",
         "show-empty": false,

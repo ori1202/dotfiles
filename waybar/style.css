@@ -1,76 +1,95 @@
-@define-color foreground-hover #c4b5fd;		/* tw violet-300 */
-@define-color foreground-inactive #ffffff; 	/* white */
-@define-color foreground #8b5cf6;		/* tw violet-500 */
-@define-color background transparent;
-
+/* Transparent bar; purple text; active tab = brighter purple (no fills) */
+@define-color text_faint rgba(196, 186, 220, 0.36);
+@define-color text_muted rgba(196, 186, 220, 0.58);
+@define-color text_default rgba(230, 224, 248, 0.88);
+@define-color text_bright rgba(242, 238, 252, 0.96);
+@define-color tab_inactive rgba(180, 165, 210, 0.55);
+@define-color tab_active #d4b8ff;
 
 * {
-    	font-family: JetBrainsMono Nerd Font;
-    	padding: 0;
-    	margin: 0;
-}
-#waybar {
-    	color: @foreground-inactive;
-    	background-color: rgba(0, 40, 255, 0.1);
+	font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", ui-monospace, monospace;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 0;
+	margin: 0;
 }
 
+#waybar {
+	color: @text_default;
+	background-color: transparent;
+}
 
 /************************/
 /*  SPECIALS            */
 /************************/
 
 #custom-now-playing {
-    	color: #ffffff;
-    	font-weight: bold;
-    	padding: 0 10px;
+	color: @text_muted;
+	font-weight: normal;
+	padding: 0 8px;
 }
 
 #custom-lframe {
-	padding: 0 0 0 10px;
+	color: @text_faint;
+	padding: 0 0 0 8px;
+	font-weight: normal;
 }
 
 #custom-rframe {
-	padding: 0 10px 0 0;
+	color: @text_faint;
+	padding: 0 8px 0 0;
+	font-weight: normal;
 }
 
 /************************/
-/*  WORKSPACE BOTTONS   */
+/*  WORKSPACE TABS (CFFI) */
 /************************/
 
-/* i use special font and icon, please don't use this style. */
-#workspaces button {
-	font-size: 28px;
-	padding: 0 4px 0 4px;
-	color: @foreground-inactive;
+#hypr-workspace-tabs {
+	padding: 0;
+}
+
+#hypr-workspace-tabs button.workspace-tab {
+	min-height: 0;
+	min-width: 0;
+	padding: 0 6px;
+	margin: 0;
+	background: transparent;
 	border: none;
+	border-radius: 3px;
+	box-shadow: none;
 }
 
-#workspaces button:hover {
-	color: @foreground-hover;
-	padding: 1px 4px 0 4px;
+#hypr-workspace-tabs button.workspace-tab:hover {
+	background: transparent;
 }
 
-#workspaces button.active {
-	color: @foreground;
+#hypr-workspace-tabs button.workspace-tab label {
+	font-size: 10px;
+	font-weight: normal;
+	color: @tab_inactive;
 }
 
-#workspaces button.urgent {
-	color: @foreground;
+#hypr-workspace-tabs button.workspace-tab:hover label {
+	color: @text_default;
 }
 
+#hypr-workspace-tabs button.workspace-tab-active {
+	background: transparent;
+}
 
+#hypr-workspace-tabs button.workspace-tab-active label {
+	color: @tab_active;
+	font-weight: bold;
+}
 
 /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
-/* a default css fix for GTK css */
 button:hover {
-  	box-shadow: none; /* Remove predefined box-shadow */
-  	text-shadow: none; /* Remove predefined text-shadow */
-  	background: none; /* Remove predefined background color (white) */
-  	transition: none; /* Disable predefined animations */
+	box-shadow: none;
+	text-shadow: none;
+	background: none;
+	transition: none;
 }
-
-
-
 
 #idle_inhibitor,
 #cava,
@@ -84,68 +103,62 @@ button:hover {
 #tray,
 #mpris,
 #load {
-    padding: 0 10px;
-    background-color: @background;
-    /* color: @foreground; */
+	padding: 0 8px;
+	background-color: transparent;
+	color: @text_muted;
+	font-weight: normal;
+}
 
-    color: #ffffff;
-    	font-weight: bold;
-    	padding: 0 10px;
+#clock,
+#idle_inhibitor {
+	color: @text_default;
 }
 
 #mode {
-    background-color: @background;
-    /* color: @foreground; */
-
-    color: #ffffff;
-    font-weight: bold;
-    padding: 0 10px;
-
-    /* box-shadow: inset 0 -3px #ffffff; */
+	color: @text_bright;
+	font-weight: bold;
 }
 
-/* If workspaces is the leftmost module, omit left margin */
 .modules-left > widget:first-child > #workspaces {
-    margin-left: 0;
+	margin-left: 0;
 }
 
-/* If workspaces is the rightmost module, omit right margin */
 .modules-right > widget:last-child > #workspaces {
-    margin-right: 0;
+	margin-right: 0;
 }
 
 #cava {
-    padding: 0 5px;
+	padding: 0 6px;
 }
 
-
 @keyframes blink {
-    to {
-        background-color: @background;
-        color: #ebdbb2;
-    }
+	to {
+		background-color: transparent;
+		color: @text_muted;
+	}
 }
 
 label:focus {
-    background-color: @background;
+	background-color: transparent;
 }
 
 #wireplumber.muted {
-    background-color: @background;
+	opacity: 0.55;
 }
 
 #tray > .passive {
-    -gtk-icon-effect: dim;
+	-gtk-icon-effect: dim;
 }
 
 #tray > .needs-attention {
-    -gtk-icon-effect: highlight;
+	-gtk-icon-effect: highlight;
 }
 
 #tray menu {
-    font-family: sans-serif;
+	font-family: system-ui, sans-serif;
+	font-size: 11px;
 }
 
 #scratchpad.empty {
-    background: transparent;
+	background: transparent;
 }
