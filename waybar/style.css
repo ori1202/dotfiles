@@ -1,164 +1,256 @@
-/* Transparent bar; purple text; active tab = brighter purple (no fills) */
-@define-color text_faint rgba(196, 186, 220, 0.36);
-@define-color text_muted rgba(196, 186, 220, 0.58);
-@define-color text_default rgba(230, 224, 248, 0.88);
-@define-color text_bright rgba(242, 238, 252, 0.96);
-@define-color tab_inactive rgba(180, 165, 210, 0.55);
-@define-color tab_active #d4b8ff;
+@import "omarchy-colors.css";
 
 * {
-	font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", ui-monospace, monospace;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 0;
-	margin: 0;
+  /* background-color: @background; */
+  /* color: @foreground; */
+
+  border: none;
+  padding: 0px;
+  min-height: 0;
+  font-family: 'JetBrainsMono Nerd Font';
+  font-weight: normal;
 }
 
-#waybar {
-	color: @text_default;
-	background-color: transparent;
+window#waybar  {
+  background: @background;
+  color: @foreground;
+  transition-property: background-color;
+  transition-duration: .5s;
+  border-bottom: 2.5px solid rgba(255, 255, 255, 0.1);
 }
 
-/************************/
-/*  SPECIALS            */
-/************************/
-
-#custom-now-playing {
-	color: @text_muted;
-	font-weight: normal;
-	padding: 0 8px;
+.modules-left {
+  margin-left: 4px;
 }
 
-#custom-lframe {
-	color: @text_faint;
-	padding: 0 0 0 8px;
-	font-weight: normal;
+.modules-right {
+  margin-right: 8px;
 }
 
-#custom-rframe {
-	color: @text_faint;
-	padding: 0 8px 0 0;
-	font-weight: normal;
+/* --- Workspaces --- */
+#workspaces {
+  border-radius: 2px;
+  margin: 6px 0 2px 0;
+  opacity: 0.95;
 }
 
-/************************/
-/*  WORKSPACE TABS (CFFI) */
-/************************/
-
-#hypr-workspace-tabs {
-	padding: 0;
+#workspaces button {
+  font-size: 10px;
+  padding: 0px 5px;
+  margin: 3px 1px 3px 1px;
+  border-radius: 2px;
+  background-color: alpha(@foreground, 0.8);
+  color: @background; 
+  transition: all 0.3s ease-in-out;
+  opacity: 0.65;
 }
 
-#hypr-workspace-tabs button.workspace-tab {
-	min-height: 0;
-	min-width: 0;
-	padding: 0 6px;
-	margin: 0;
-	background: transparent;
-	border: none;
-	border-radius: 3px;
-	box-shadow: none;
+#workspaces button.active {
+  font-size: 10px;
+  padding: 0px 5px;
+  margin: 3px 1px 3px 1px;
+  border-radius: 2px;
+  color: @background;
+  background-color: alpha(@foreground, 0.9);
+  transition: all 0.3s ease-in-out;
+  opacity: 1;
+}
+#workspaces button:hover.empty,
+#workspaces button:hover {
+    background-color: @foreground;
+    color: @background;
+    opacity: 1;
 }
 
-#hypr-workspace-tabs button.workspace-tab:hover {
-	background: transparent;
+#workspaces button.empty.active {
+  font-size: 10px;
+  padding: 0px 5px;
+  margin: 3px 1px 3px 1px;
+  border-radius: 2px;
+  color: @background;
+  background-color: alpha(@foreground, 0.9);
+  transition: all 0.3s ease-in-out;
+  opacity: 1;
 }
 
-#hypr-workspace-tabs button.workspace-tab label {
-	font-size: 10px;
-	font-weight: normal;
-	color: @tab_inactive;
+#workspaces button.empty {
+  font-size: 10px;
+  background-color: alpha(@foreground, 0.65);
+  opacity: 0.3;
 }
 
-#hypr-workspace-tabs button.workspace-tab:hover label {
-	color: @text_default;
-}
 
-#hypr-workspace-tabs button.workspace-tab-active {
-	background: transparent;
-}
-
-#hypr-workspace-tabs button.workspace-tab-active label {
-	color: @tab_active;
-	font-weight: bold;
-}
-
-/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
-button:hover {
-	box-shadow: none;
-	text-shadow: none;
-	background: none;
-	transition: none;
-}
 
 #idle_inhibitor,
-#cava,
-#scratchpad,
-#mode,
-#window,
+#custom-updatespacman,
+#custom-omarchy,
+#custom-update,
+#custom-screenrecording-indicator,
 #clock,
+#mpris
+#tray,
+#custom-split,
+#cpu,
+#memory,
 #battery,
 #backlight,
-#wireplumber,
-#tray,
+#network,
+#custom-idle-indicator,
+#custom-notification-silencing-indicator,
+#custom-voxtype,
+#custom-voxtype.transcribing,
+#custom-voxtype.recording,
+#power-profiles-daemon,
 #mpris,
-#load {
-	padding: 0 8px;
-	background-color: transparent;
-	color: @text_muted;
-	font-weight: normal;
+#bluetooth,
+#pulseaudio {
+  font-size: 12px;
+  min-width: 10px;
+  margin: 3px 0px 0px 0px;
+  padding: 0 4px;
 }
 
-#clock,
-#idle_inhibitor {
-	color: @text_default;
+tooltip {
+  padding: 2px;
 }
 
-#mode {
-	color: @text_bright;
-	font-weight: bold;
+#custom-voxtype {
+  min-width: 12px;
+  margin: 0 0 0 7.5px;
 }
 
-.modules-left > widget:first-child > #workspaces {
-	margin-left: 0;
+#custom-voxtype.recording {
+  color: #a55555;
 }
 
-.modules-right > widget:last-child > #workspaces {
-	margin-right: 0;
+#power-profiles-daemon,
+#power-profiles-daemon.performance,
+#power-profiles-daemon.balanced,
+#power-profiles-daemon.power-saver {
+font-size: 16px;
+margin-top: 3px;
+margin-right: 4px;
 }
 
-#cava {
-	padding: 0 6px;
+#custom-idle-indicator,
+#custom-notification-silencing-indicator {
+  min-width: 12px;
+  margin-left: 0;
+  margin-right: 0;
+  font-size: 12px;
+  padding-bottom: 0px;
 }
 
-@keyframes blink {
-	to {
-		background-color: transparent;
-		color: @text_muted;
-	}
+#custom-idle-indicator.active,
+#custom-notification-silencing-indicator.active {
+  color: #a55555;
 }
 
-label:focus {
-	background-color: transparent;
+/* LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Style power-drawer items like waybar tooltip chips. 2026-08-25. */
+#custom-power-sleep,
+#custom-power-restart,
+#custom-power-shutdown {
+  font-size: 10px;
+  margin: 4px 2px 2px 2px;
+  padding: 0 8px;
+  background: @background;
+  color: @foreground;
+  border: 1px solid alpha(@foreground, 0.8);
+  border-radius: 8px;
 }
 
-#wireplumber.muted {
-	opacity: 0.55;
+#custom-power-sleep:hover,
+#custom-power-restart:hover,
+#custom-power-shutdown:hover {
+  background: alpha(@foreground, 0.12);
+}
+/* LLM PROMPT [end] */
+
+#tray {
+    background-color: @transparent;
+    margin-top: 4px;
 }
 
 #tray > .passive {
-	-gtk-icon-effect: dim;
+    -gtk-icon-effect: dim;
 }
 
 #tray > .needs-attention {
-	-gtk-icon-effect: highlight;
+    -gtk-icon-effect: highlight;
+    background-color: @transparent;
 }
 
-#tray menu {
-	font-family: system-ui, sans-serif;
-	font-size: 11px;
+.hidden {
+  opacity: 0;
 }
 
-#scratchpad.empty {
-	background: transparent;
+tooltip {
+ padding: 4px;
+ background: @background;
+ font-size: 10px;
+ border: 1px solid alpha(@foreground, 0.8);
+ border-radius: 8px;
+}
+tooltip label {
+    color: @foreground;
+    font-weight: normal;
+}
+
+/* Specific animation Module */
+
+#custom-screenrecording-indicator {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  color: transparent;
+}
+
+#custom-screenrecording-indicator.active {
+  color: #eb7087;
+  animation-name: blink-recording;
+  animation-duration: 0.5s;
+}
+
+@keyframes blink-recording {
+    to {
+        color: @background;
+    }
+}
+
+
+#mpris {
+color: @foreground;
+animation: repeat;
+	animation-name: blink;
+	animation-duration: 3s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes blink {
+    to {
+        color: #4a4a4a;
+        
+    }
+}
+#battery.warning {
+  color: #c95d0f;
+}
+
+@keyframes blink2 {
+  to {
+    background-color: transparent;
+    color: #f53c3c;
+  }
+}
+
+#battery.critical:not(.charging) {
+  background-color: transparent;
+  color: #e6d8ba;
+  animation-name: blink2;
+  animation-duration: 0.5s;
+  animation-timing-function: steps(12);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
 }

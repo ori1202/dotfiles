@@ -18,7 +18,19 @@ return {
   { "L3MON4D3/LuaSnip" },
 
   -- Syntax Highlighting
-  { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+  -- LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Configure Tree-sitter to install and highlight the C++ parser. 2026-09-02.
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        ensure_installed = { "c", "cpp", "rust", "typescript", "lua" },
+        highlight = { enable = true },
+        indent = { enable = true },
+      })
+    end,
+  },
+  -- LLM PROMPT [end]
 
   -- ⟢RustyChan🦀
   {

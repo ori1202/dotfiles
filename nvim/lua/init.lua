@@ -1,4 +1,3 @@
-require("config.lazy")
 require("config.lsp")
 
 local cmp = require("cmp")
@@ -16,10 +15,6 @@ cmp.setup({
   },
 })
 
-require("nvim-treesitter.configs").setup {
-  ensure_installed = { "c", "cpp", "rust", "typescript", "lua" },
-  highlight = { enable = true },
-}
 
 require("nvim-tree").setup()
 vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>")
