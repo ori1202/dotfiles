@@ -1,0 +1,160 @@
+/* Transparent bar; active tab = brighter accent (no fills) */
+/* Color palette is managed by theme-switch; see ~/.config/theme-switcher */
+@import "colors.css";
+
+* {
+	font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", ui-monospace, monospace;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 0;
+	margin: 0;
+}
+
+#waybar {
+	color: @text_default;
+	background-color: transparent;
+}
+
+/************************/
+/*  SPECIALS            */
+/************************/
+
+#custom-now-playing {
+	color: @text_muted;
+	font-weight: normal;
+	padding: 0 8px;
+}
+
+#custom-lframe {
+	color: @text_faint;
+	padding: 0 0 0 8px;
+	font-weight: normal;
+}
+
+#custom-rframe {
+	color: @text_faint;
+	padding: 0 8px 0 0;
+	font-weight: normal;
+}
+
+/************************/
+/*  WORKSPACE TABS (CFFI) */
+/************************/
+
+#hypr-workspace-tabs {
+	padding: 0;
+}
+
+#hypr-workspace-tabs button.workspace-tab {
+	min-height: 0;
+	min-width: 0;
+	padding: 0 6px;
+	margin: 0;
+	background: transparent;
+	border: none;
+	border-radius: 3px;
+	box-shadow: none;
+}
+
+#hypr-workspace-tabs button.workspace-tab:hover {
+	background: transparent;
+}
+
+#hypr-workspace-tabs button.workspace-tab label {
+	font-size: 10px;
+	font-weight: normal;
+	color: @tab_inactive;
+}
+
+#hypr-workspace-tabs button.workspace-tab:hover label {
+	color: @text_default;
+}
+
+#hypr-workspace-tabs button.workspace-tab-active {
+	background: transparent;
+}
+
+#hypr-workspace-tabs button.workspace-tab-active label {
+	color: @tab_active;
+	font-weight: bold;
+}
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+button:hover {
+	box-shadow: none;
+	text-shadow: none;
+	background: none;
+	transition: none;
+}
+
+#idle_inhibitor,
+#cava,
+#scratchpad,
+#mode,
+#window,
+#clock,
+#battery,
+#backlight,
+#wireplumber,
+#tray,
+#mpris,
+#load {
+	padding: 0 8px;
+	background-color: transparent;
+	color: @text_muted;
+	font-weight: normal;
+}
+
+#clock,
+#idle_inhibitor {
+	color: @text_default;
+}
+
+#mode {
+	color: @text_bright;
+	font-weight: bold;
+}
+
+.modules-left > widget:first-child > #workspaces {
+	margin-left: 0;
+}
+
+.modules-right > widget:last-child > #workspaces {
+	margin-right: 0;
+}
+
+#cava {
+	padding: 0 6px;
+}
+
+@keyframes blink {
+	to {
+		background-color: transparent;
+		color: @text_muted;
+	}
+}
+
+label:focus {
+	background-color: transparent;
+}
+
+#wireplumber.muted {
+	opacity: 0.55;
+}
+
+#tray > .passive {
+	-gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+	-gtk-icon-effect: highlight;
+}
+
+#tray menu {
+	font-family: system-ui, sans-serif;
+	font-size: 11px;
+}
+
+#scratchpad.empty {
+	background: transparent;
+}

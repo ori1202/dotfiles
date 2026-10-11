@@ -1,6 +1,5 @@
 # Ignore everything
 *
-
 # Allow specific files and directories (whitelist)
 !.gitignore
 
@@ -11,23 +10,69 @@
 !autostart/
 !autostart/**
 
+!btop/
+!btop/**
+
 !dconf/
 !dconf/**
+
+!dunst/
+!dunst/**
 
 !fastfetch/
 !fastfetch/**
 
-!hypr/
-!hypr/**
-
-!waybar/
-!waybar/**
+!fish/
+!fish/**
 
 !ghostty/
 !ghostty/**
 
+!glow/
+!glow/**
+
+!go/
+!go/**
+
+!htop/
+!htop/**
+
+!hypr/
+!hypr/**
+
+!menus/
+!menus/**
+
+!mpv/
+!mpv/**
+
 !nvim/
 !nvim/**
 
-!fish/
-!fish/**
+!pulse/
+!pulse/**
+
+!quickshell/
+!quickshell/**
+
+!starship.toml
+
+!sunshine/
+!sunshine/**
+
+!theme-switcher/
+!theme-switcher/**
+
+!waybar/
+!waybar/**
+
+!ytfzf/
+!ytfzf/**
+
+# Secrets / runtime junk inside allowed dirs
+pulse/cookie
+sunshine/credentials/
+sunshine/*.log
+sunshine/*.log.*
+sunshine/sunshine_state.json
+theme-switcher/target/

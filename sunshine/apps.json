@@ -1,0 +1,250 @@
+{
+    "apps": [
+        {
+            "image-path": "desktop.png",
+            "name": "Desktop"
+        },
+        {
+            "auto-detach": true,
+            "cmd": "",
+            "detached": [
+                "scripts/start-stream.sh"
+            ],
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/screenshot.png",
+            "name": "Hyprland Stream",
+            "output": "",
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "image-path": "desktop.png",
+            "name": "Low Res Desktop",
+            "prep-cmd": [
+                {
+                    "do": "xrandr --output HDMI-1 --mode 1920x1080",
+                    "undo": "xrandr --output HDMI-1 --mode 1920x1200"
+                }
+            ]
+        },
+        {
+            "detached": [
+                "setsid steam steam://open/bigpicture"
+            ],
+            "image-path": "steam.png",
+            "name": "Steam Big Picture",
+            "prep-cmd": [
+                {
+                    "do": "",
+                    "undo": "setsid steam steam://close/bigpicture"
+                }
+            ]
+        },
+        {
+            "auto-detach": true,
+            "cmd": "",
+            "detached": [
+                "scripts/stream-stop.sh"
+            ],
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "",
+            "name": "Steam Virtual Monitor",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "scripts/stream-start.sh",
+                    "undo": ""
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/anime-tv-start.sh",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/WP/dark-red/jpg(3).png",
+            "name": "anime-tv",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/anime-tv-start.sh",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 15,
+            "image-path": "",
+            "name": "sleep-test",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/miruro-launch.sh https://www.miruro.to/info/5114/fullmetal-alchemist-brotherhood",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/moonlight-profiles/fma-brotherhood.png",
+            "name": "FMA Brotherhood",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/miruro-launch.sh https://www.miruro.to/",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/moonlight-profiles/miruro-home.png",
+            "name": "Miruro",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/miruro-launch.sh https://www.miruro.to/watch/116674/bleach-sennen-kessen-hen",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/moonlight-profiles/bleach-tybw.png",
+            "name": "Bleach TYBW",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/miruro-launch.sh https://www.miruro.to/watch/159322/one-piece",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/moonlight-profiles/bleach-separation.png",
+            "name": "Bleach TYBW - Separation",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/miruro-launch.sh https://www.miruro.to/watch/169755/bleach-sennen-kessen-hen-soukoku-tan",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/moonlight-profiles/bleach-conflict.png",
+            "name": "Bleach TYBW - Conflict",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/miruro-launch.sh https://www.miruro.to/watch/185874/bleach-sennen-kessen-hen-kashin-tan",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/moonlight-profiles/bleach-calamity.png",
+            "name": "Bleach TYBW - Calamity",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/miruro-launch.sh https://drive.google.com/drive/folders/15qKlZuMgALeSVMd6O1p6kowPCPsxbJer",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/moonlight-profiles/all-ninjago-tvshow.png",
+            "name": "all-ninjago-tvshow",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori"
+        },
+        {
+            "auto-detach": false,
+            "cmd": "/home/ori/.local/bin/the-menu-start.sh",
+            "elevated": false,
+            "exclude-global-prep-cmd": false,
+            "exit-timeout": 5,
+            "image-path": "/home/ori/Pictures/moonlight-profiles/the-menu.png",
+            "name": "the menu",
+            "output": "",
+            "prep-cmd": [
+                {
+                    "do": "/home/ori/.local/bin/moonlight-profile-prep.sh",
+                    "undo": "/home/ori/.local/bin/moonlight-profile-undo.sh"
+                }
+            ],
+            "wait-all": true,
+            "working-dir": "/home/ori/Downloads/lego-ninjago"
+        }
+    ],
+    "env": {
+        "PATH": "$(PATH):$(HOME)/.local/bin"
+    }
+}

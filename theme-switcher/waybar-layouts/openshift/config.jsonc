@@ -1,0 +1,144 @@
+// openshift layout: V7.2a's features/icons + V7.1a's rounded pill-button
+// shaping (floating island clusters). Your cffi workspace tabs and now-playing
+// are kept; Omarchy-only modules dropped. Red Hat red accent (#ee0000).
+// Colors from omarchy-colors.css (driven by the theme).
+{
+    "reload_style_on_change": true,
+    "layer": "top",
+    "position": "top",
+    "exclusive": true,
+    "spacing": 0,
+    "margin-top": 0,
+    "margin-left": 40,
+    "margin-right": 40,
+    "modules-left": [
+        "clock",
+        "cffi/hypr-ws-tabs",
+        "idle_inhibitor"
+    ],
+    "modules-center": [
+        "custom/now-playing"
+    ],
+    "modules-right": [
+        "network",
+        "cpu",
+        "memory",
+        "pulseaudio#input",
+        "pulseaudio#output",
+        "group/tray-expander",
+        "custom/power"
+    ],
+
+    "cffi/hypr-ws-tabs": {
+        "module_path": "/home/ori/.config/waybar/workspace-daemon/target/release/libwaybar_hypr_ws.so",
+        "max-tabs": 16
+    },
+    "clock": {
+        "format": "<span color='#ee0000'>{0:%H:%M}</span> <span size='small' color='#808080'><i>{0:%a, %b %d}</i></span>",
+        "format-alt": "{:L%d %B W%V %Y}",
+        "tooltip-format": "<span>{calendar}</span>",
+        "calendar": {
+            "mode": "month",
+            "mode-mon-col": 3,
+            "on-click-right": "mode",
+            "format": {
+                "month": "<span color='#f0f0f0'><b>{}</b></span>",
+                "weekdays": "<span color='#ee0000'><b>{}</b></span>",
+                "today": "<span color='#ff6699'><b>{}</b></span>"
+            }
+        }
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "tooltip-format-activated": "Stay Awake: ON",
+        "tooltip-format-deactivated": "Stay Awake: OFF",
+        "format-icons": {
+            "activated": "󰛨",
+            "deactivated": "󰛩"
+        }
+    },
+    "custom/now-playing": {
+        "format": "{}",
+        "interval": 2,
+        "exec": "~/.config/waybar/scripts/now-playing.sh",
+        "return-type": "text",
+        "on-click": "playerctl play-pause",
+        "on-scroll-up": "playerctl next",
+        "on-scroll-down": "playerctl previous"
+    },
+    "network": {
+        "format": "<span color='#ee0000'>net</span> on",
+        "format-wifi": "<span color='#ee0000'>wifi</span> {essid}",
+        "format-ethernet": "<span color='#ee0000'>eth</span> on",
+        "format-disconnected": "<span color='#ee0000'>net</span> off",
+        "tooltip-format-wifi": "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+        "tooltip-format-ethernet": "⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+        "tooltip-format-disconnected": "Disconnected",
+        "interval": 3,
+        "spacing": 1
+    },
+    "cpu": {
+        "interval": 5,
+        "format": "<span color='#ee0000'>cpu</span> {usage:02}%",
+        "on-click": "ghostty -e btop",
+        "states": {
+            "warning": 50,
+            "critical": 80
+        }
+    },
+    "memory": {
+        "interval": 5,
+        "format": "<span color='#ee0000'>mem</span> {percentage:02}%",
+        "tooltip-format": "Used {percentage}%\n{used:0.1f}GB/{total:0.1f}GB",
+        "on-click": "ghostty -e btop",
+        "states": {
+            "warning": 50,
+            "critical": 80
+        }
+    },
+    "pulseaudio#input": {
+        "format": "<span color='#ee0000'>mic</span> {source_volume}%",
+        "format-source-muted": "<span color='#ee0000'>mic</span> muted",
+        "tooltip-format": "mic {source_volume}%",
+        "scroll-step": 1,
+        "max-volume": 100,
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 1%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 1%-"
+    },
+    "pulseaudio#output": {
+        "format": "<span color='#ee0000'>vol</span> {volume}%",
+        "format-muted": "<span color='#ee0000'>vol</span> muted",
+        "tooltip-format": "vol {volume}%",
+        "max-volume": 100,
+        "scroll-step": 2,
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+    },
+    "group/tray-expander": {
+        "orientation": "inherit",
+        "drawer": {
+            "transition-duration": 600,
+            "children-class": "tray-group-item"
+        },
+        "modules": [
+            "custom/expand-icon",
+            "tray"
+        ]
+    },
+    "custom/expand-icon": {
+        "format": "",
+        "tooltip": false
+    },
+    "tray": {
+        "icon-size": 14,
+        "spacing": 6
+    },
+    "custom/power": {
+        "format": "",
+        "tooltip-format": "Shutdown  \u2022  right-click: reboot",
+        "on-click": "systemctl poweroff",
+        "on-click-right": "systemctl reboot"
+    }
+}

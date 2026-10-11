@@ -1,0 +1,222 @@
+/* openshift layout: V7.2a features/icons with V7.1a rounded pill-button
+   shaping (floating island clusters) and Red Hat / OpenShift red accents.
+   Colors from omarchy-colors.css (@background / @foreground / @red). */
+@import "omarchy-colors.css";
+
+* {
+    font-family: "CaskaydiaCove Nerd Font", "Symbols Nerd Font Mono", monospace;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+/* Floating rounded island clusters (V7.1a style) */
+.modules-left,
+.modules-center,
+.modules-right {
+    background-color: @background;
+    border-radius: 20px;
+    padding: 0 5px;
+    margin: 8px 5px;
+    min-height: 30px;
+    border: 1px solid alpha(@foreground, 0.15);
+}
+
+.modules-left {
+    margin-left: 8px;
+    border-bottom: 2px solid @red;
+}
+
+.modules-right {
+    margin-right: 8px;
+    border-bottom: 2px solid @red;
+}
+
+.modules-center {
+    border-bottom: 2px solid @red;
+}
+
+window#waybar.empty .modules-center {
+    background: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Module pill buttons */
+#clock,
+#network,
+#network.disconnected,
+#network.wifi,
+#network.ethernet,
+#cpu,
+#memory,
+#pulseaudio,
+#pulseaudio.input,
+#pulseaudio.output,
+#idle_inhibitor,
+#custom-now-playing {
+    background-color: alpha(@foreground, 0.1);
+    color: @foreground;
+    padding: 0 12px;
+    margin: 5px 3px;
+    border-radius: 15px;
+}
+
+#clock:hover,
+#network:hover,
+#cpu:hover,
+#memory:hover,
+#pulseaudio:hover,
+#idle_inhibitor:hover,
+#custom-now-playing:hover {
+    background-color: alpha(@foreground, 0.2);
+    transition: 0.7s;
+}
+
+/* Clock chip: keep transparent so the red time / gray date markup reads */
+#clock {
+    background-color: transparent;
+    padding: 0 14px;
+}
+
+/* Workspace tabs (cffi) as a rounded island with pill buttons */
+#hypr-workspace-tabs {
+    background-color: alpha(@foreground, 0.05);
+    padding: 0;
+    margin: 5px 4px;
+    border-radius: 15px;
+}
+
+#hypr-workspace-tabs button.workspace-tab {
+    min-height: 0;
+    min-width: 0;
+    padding: 0 9px;
+    margin: 3px 2px;
+    background: alpha(@foreground, 0.15);
+    border: none;
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+#hypr-workspace-tabs button.workspace-tab label {
+    color: alpha(@foreground, 0.75);
+    font-size: 12px;
+}
+
+#hypr-workspace-tabs button.workspace-tab:hover {
+    background: alpha(@foreground, 0.3);
+    transition: 0.4s;
+}
+
+#hypr-workspace-tabs button.workspace-tab:hover label {
+    color: @foreground;
+}
+
+#hypr-workspace-tabs button.workspace-tab-active {
+    background: @red;
+}
+
+#hypr-workspace-tabs button.workspace-tab-active label {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* Idle inhibitor icon */
+#idle_inhibitor.activated {
+    color: @red;
+}
+
+#idle_inhibitor.deactivated {
+    color: alpha(@foreground, 0.6);
+}
+
+/* Now playing (center) */
+#custom-now-playing {
+    background-color: transparent;
+    color: alpha(@foreground, 0.85);
+    padding: 0 12px;
+}
+
+/* Collapsible tray */
+#custom-expand-icon {
+    color: alpha(@foreground, 0.5);
+    padding: 0 10px;
+    margin: 5px 2px;
+    border-radius: 15px;
+    background-color: alpha(@foreground, 0.1);
+}
+
+#custom-expand-icon:hover {
+    background-color: alpha(@foreground, 0.2);
+    transition: 0.7s;
+}
+
+#tray {
+    background-color: transparent;
+    padding: 0 2px;
+    margin: 5px 2px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+}
+
+/* Shutdown button: red brand pill */
+#custom-power {
+    color: #ffffff;
+    background-color: @red;
+    font-size: 14px;
+    padding: 0 12px;
+    margin: 5px 3px 5px 4px;
+    border-radius: 15px;
+}
+
+#custom-power:hover {
+    background-color: #ff4d4d;
+    transition: 0.4s;
+}
+
+/* Load / connection states */
+#network.disconnected {
+    color: #c95d0f;
+}
+
+#pulseaudio.warning,
+#memory.warning,
+#cpu.warning {
+    color: #e3c1b1;
+}
+
+#pulseaudio.critical,
+#memory.critical,
+#cpu.critical {
+    color: @red;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+tooltip {
+    padding: 4px;
+    background: @background;
+    font-size: 11px;
+    border: 1px solid @red;
+    border-radius: 12px;
+}
+
+tooltip label {
+    color: @foreground;
+    font-weight: normal;
+}

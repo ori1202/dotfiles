@@ -1,0 +1,6 @@
+singleton Audio 1.0 Audio.qml
+singleton TimerBridge 1.0 TimerBridge.qml
+singleton Calendar 1.0 Calendar.qml
+singleton SystemStats 1.0 SystemStats.qml
+singleton ZenBridge 1.0 ZenBridge.qml
+singleton MusicDownloads 1.0 MusicDownloads.qml

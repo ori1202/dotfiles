@@ -1,0 +1,239 @@
+#!/usr/bin/env python3
+# LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Download tracks with yt-dlp and track which songs are already saved. 2026-10-11.
+"""Download the current track into ~/Music and report download status."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+MUSIC_DIR = Path(os.environ.get("MUSIC_DIR", "~/Music")).expanduser()
+INDEX_FILE = MUSIC_DIR / ".qs-downloads.json"
+
+
+def load_index() -> dict:
+    try:
+        data = json.loads(INDEX_FILE.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            data.setdefault("byUrl", {})
+            data.setdefault("byKey", {})
+            return data
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        pass
+    return {"byUrl": {}, "byKey": {}}
+
+
+def save_index(data: dict) -> None:
+    MUSIC_DIR.mkdir(parents=True, exist_ok=True)
+    temporary = INDEX_FILE.with_suffix(".tmp")
+    temporary.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    temporary.replace(INDEX_FILE)
+
+
+def normalize(value: str) -> str:
+    text = (value or "").strip().lower()
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"[^\w\s\-&.]", "", text, flags=re.UNICODE)
+    return text
+
+
+def track_key(artist: str, title: str) -> str:
+    return f"{normalize(artist)}|{normalize(title)}"
+
+
+def playerctl(*fields: str) -> str:
+    try:
+        result = subprocess.run(
+            ["playerctl", "metadata", *fields],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return ""
+    return (result.stdout or "").strip() if result.returncode == 0 else ""
+
+
+def resolve_url(cli_url: str) -> str:
+    return normalize_media_url(cli_url.strip() or playerctl("xesam:url"))
+
+
+def normalize_media_url(url: str) -> str:
+    """Prefer a clean youtube.com watch URL for music.youtube.com / youtu.be links."""
+    if not url:
+        return ""
+    match = re.search(
+        r"(?:music\.)?youtube\.com/watch\?[^#]*\bv=([\w-]{11})|youtu\.be/([\w-]{11})|youtube\.com/shorts/([\w-]{11})",
+        url,
+        re.I,
+    )
+    if match:
+        video_id = match.group(1) or match.group(2) or match.group(3)
+        return f"https://www.youtube.com/watch?v={video_id}"
+    return url
+
+
+def existing_path(path_str: str) -> str:
+    if not path_str:
+        return ""
+    path = Path(path_str).expanduser()
+    return str(path) if path.is_file() else ""
+
+
+def find_on_disk(artist: str, title: str) -> str:
+    if not title or not MUSIC_DIR.is_dir():
+        return ""
+    title_n = normalize(title)
+    artist_n = normalize(artist)
+    if not title_n:
+        return ""
+
+    wanted = normalize(f"{artist} - {title}") if artist_n else title_n
+    audio_ext = {".mp3", ".m4a", ".opus", ".ogg", ".flac", ".wav", ".aac", ".webm"}
+    exact = ""
+    titled = ""
+
+    for path in MUSIC_DIR.rglob("*"):
+        if not path.is_file() or path.name.startswith(".") or path.suffix.lower() not in audio_ext:
+            continue
+        stem = normalize(path.stem)
+        if stem == wanted:
+            exact = str(path)
+            break
+        # Prefer "Artist - Title" files; title-only only when artist unknown.
+        if artist_n:
+            if stem.endswith(" - " + title_n) and artist_n in stem and not titled:
+                titled = str(path)
+        elif stem == title_n and not titled:
+            titled = str(path)
+
+    return exact or titled
+
+
+def status(url: str, title: str, artist: str) -> dict:
+    index = load_index()
+    path = ""
+
+    if url:
+        path = existing_path(index.get("byUrl", {}).get(url, ""))
+    if not path:
+        key = track_key(artist, title)
+        if key != "|":
+            path = existing_path(index.get("byKey", {}).get(key, ""))
+    if not path:
+        path = find_on_disk(artist, title)
+        if path:
+            # remember discovery for faster later checks
+            if url:
+                index.setdefault("byUrl", {})[url] = path
+            key = track_key(artist, title)
+            if key != "|":
+                index.setdefault("byKey", {})[key] = path
+            save_index(index)
+
+    return {
+        "downloaded": bool(path),
+        "path": path,
+        "url": url,
+        "title": title,
+        "artist": artist,
+    }
+
+
+def record(url: str, title: str, artist: str, path: str) -> None:
+    if not path:
+        return
+    index = load_index()
+    if url:
+        index.setdefault("byUrl", {})[url] = path
+    key = track_key(artist, title)
+    if key != "|":
+        index.setdefault("byKey", {})[key] = path
+    save_index(index)
+
+
+def download(url: str, title: str, artist: str) -> dict:
+    if not url:
+        return {"ok": False, "error": "no url", "downloaded": False, "path": ""}
+
+    if not re.match(r"^https?://", url, re.I):
+        return {"ok": False, "error": "bad url", "downloaded": False, "path": ""}
+
+    current = status(url, title, artist)
+    if current["downloaded"]:
+        return {"ok": True, **current}
+
+    MUSIC_DIR.mkdir(parents=True, exist_ok=True)
+
+    output_template = str(MUSIC_DIR / "%(artist,uploader|Unknown)s - %(title)s.%(ext)s")
+    command = [
+        "yt-dlp",
+        "--no-playlist",
+        "-f",
+        "bestaudio/best",
+        "-x",
+        "--audio-format",
+        "best",
+        "--embed-metadata",
+        "--print",
+        "after_move:filepath",
+        "-o",
+        output_template,
+    ]
+    # Firefox YouTube Music often needs the browser cookies for full catalog access.
+    if re.search(r"youtube\.com|youtu\.be", url, re.I):
+        command.extend(["--cookies-from-browser", "firefox"])
+    command.append(url)
+    try:
+        result = subprocess.run(command, check=False, capture_output=True, text=True)
+    except OSError as exc:
+        return {"ok": False, "error": str(exc), "downloaded": False, "path": ""}
+
+    path = ""
+    for line in (result.stdout or "").splitlines():
+        line = line.strip()
+        if line and Path(line).exists():
+            path = line
+
+    if result.returncode != 0 or not path:
+        # fallback: re-check disk in case print format differed
+        path = find_on_disk(artist, title) or path
+    if result.returncode != 0 and not path:
+        err = (result.stderr or result.stdout or "download failed").strip().splitlines()
+        return {"ok": False, "error": err[-1] if err else "download failed", "downloaded": False, "path": ""}
+
+    record(url, title, artist, path)
+    return {"ok": True, "downloaded": True, "path": path, "url": url, "title": title, "artist": artist}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Download or check current track in ~/Music")
+    parser.add_argument("command", choices=["download", "status"], nargs="?", default="download")
+    parser.add_argument("--url", default="")
+    parser.add_argument("--title", default="")
+    parser.add_argument("--artist", default="")
+    # backward compatible: download-track.py [url]
+    parser.add_argument("legacy_url", nargs="?", default="")
+    args = parser.parse_args()
+
+    url = resolve_url(args.url or args.legacy_url)
+    title = args.title or playerctl("xesam:title")
+    artist = args.artist or playerctl("xesam:artist")
+
+    if args.command == "status":
+        print(json.dumps(status(url, title, artist), ensure_ascii=False))
+        return 0
+
+    result = download(url, title, artist)
+    print(json.dumps(result, ensure_ascii=False))
+    return 0 if result.get("ok") else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+# LLM PROMPT [end]

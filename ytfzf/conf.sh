@@ -1,0 +1,6 @@
+#invidious_instance="https://invidious.flokinet.to/"
+#invidious_instance="https://vid.puffyan.us"
+#invidious_instance="https://inv.nadeko.net/"
+invidious_instance="https://yewtu.be/"
+#invidious_instance="https://invidious.nerdvpn.de/"
+#invidious_instance="https://invidious.f5.si/"
