@@ -32,6 +32,10 @@ Singleton {
     property var pendingGeometryCapture: null
 
     function refreshStatus() {
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Skip Backend status shell reads in performance mode. 2026-10-12.
+        if (ShellState.performanceMode)
+            return;
+        // LLM PROMPT [end]
         if (!brightnessCommit.running && !brightnessSetProcess.running)
             brightnessProcess.running = true;
         refreshQuickControls();
@@ -39,6 +43,8 @@ Singleton {
     }
 
     function refreshQuickControls() {
+        if (ShellState.performanceMode)
+            return;
         if (!nightLightStatusProcess.running)
             nightLightStatusProcess.running = true;
         if (!powerProfileStatusProcess.running)
@@ -448,14 +454,14 @@ Singleton {
 
     Timer {
         interval: 5000
-        running: true
+        running: !ShellState.performanceMode
         repeat: true
         onTriggered: root.refreshStatus()
     }
 
     Timer {
         interval: 2000
-        running: root.recording
+        running: root.recording && !ShellState.performanceMode
         repeat: true
         onTriggered: recordingStatusProcess.running = true
     }

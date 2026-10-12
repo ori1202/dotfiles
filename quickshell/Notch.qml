@@ -14,15 +14,30 @@ PanelWindow {
     readonly property int contentPadding: 14
     readonly property int collapsedHeight: 32
     readonly property int cornerWing: 16
-    readonly property int canvasWidth: 552
-    readonly property int canvasHeight: 600
+    readonly property int canvasWidth: 720
+    readonly property int canvasHeight: 760
+    // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Zen fills the screen as a flat panel (no notch shoulders). 2026-10-12.
+    readonly property bool zenScreen: ShellState.panel === "zen"
+    // Drive flat chrome from live panel only — displayedPanel lags on close and left a stuck flat notch.
+    readonly property bool zenFlat: zenScreen
+    readonly property int screenPanelWidth: Math.max(640, (screen ? screen.width : canvasWidth) - contentPadding * 2)
+    readonly property int screenPanelHeight: Math.max(480, (screen ? screen.height : canvasHeight) - contentPadding * 2)
+    // LLM PROMPT [end]
     readonly property int requestedTopPadding: ShellState.panel === "launcher" ? 10 : contentPadding
     readonly property int requestedBottomPadding: ShellState.panel === "launcher" ? 4 : contentPadding
     readonly property int displayedTopPadding: displayedPanel === "launcher" ? 10 : contentPadding
     readonly property int displayedBottomPadding: displayedPanel === "launcher" ? 4 : contentPadding
-    readonly property real targetVisualWidth: ShellState.targetWidth + cornerWing * 2
-    readonly property real targetVisualHeight: ShellState.expanded ? panelContentHeight + requestedTopPadding + requestedBottomPadding : collapsedHeight
-    readonly property real panelContentHeight: ShellState.expanded ? Math.max(ShellState.panelHeights[ShellState.panel] || 0, requestedPanel ? requestedPanel.implicitHeight : 0) : 0
+    readonly property real targetVisualWidth: zenScreen
+        ? (screen ? screen.width : canvasWidth)
+        : ShellState.targetWidth + cornerWing * 2
+    readonly property real targetVisualHeight: zenScreen
+        ? (screen ? screen.height : canvasHeight)
+        : (ShellState.expanded ? panelContentHeight + requestedTopPadding + requestedBottomPadding : collapsedHeight)
+    readonly property real panelContentHeight: ShellState.expanded
+        ? (zenScreen
+            ? screenPanelHeight
+            : Math.max(ShellState.panelHeights[ShellState.panel] || 0, requestedPanel ? requestedPanel.implicitHeight : 0))
+        : 0
     property bool contentRevealed: false
     property bool clockRevealed: true
     property string displayedPanel: "control"
@@ -104,9 +119,12 @@ PanelWindow {
 
     }
 
-    margins.left: Math.round((screen.width - canvasWidth) / 2)
-    implicitWidth: canvasWidth
-    implicitHeight: canvasHeight
+    // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Expand notch window to the screen for zen; same top flush as other panels. 2026-10-12.
+    margins.left: zenScreen ? 0 : Math.round((screen.width - canvasWidth) / 2)
+    margins.top: 0
+    implicitWidth: zenScreen ? Math.max(canvasWidth, screen.width) : canvasWidth
+    implicitHeight: zenScreen ? Math.max(canvasHeight, screen.height) : canvasHeight
+    // LLM PROMPT [end]
     color: "transparent"
     aboveWindows: true
     focusable: ShellState.expanded
@@ -126,6 +144,9 @@ PanelWindow {
                 window.displayedPanel = ShellState.panel;
                 focusTimer.restart();
             } else {
+                // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Clear displayed panel on close so zen flat chrome does not stick. 2026-10-12.
+                window.displayedPanel = "clock";
+                // LLM PROMPT [end]
                 clockRevealTimer.restart();
             }
         }
@@ -162,15 +183,20 @@ PanelWindow {
         Rectangle {
             id: notchBody
 
-            x: window.cornerWing
-            y: -15
-            width: parent.width - window.cornerWing * 2
-            height: parent.height + 15
-            radius: Theme.radius
+            // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Flat full-rect body for screen-sized zen; notch hang otherwise. 2026-10-12.
+            x: window.zenFlat ? 0 : window.cornerWing
+            y: window.zenFlat ? 0 : -15
+            width: window.zenFlat ? parent.width : parent.width - window.cornerWing * 2
+            height: window.zenFlat ? parent.height : parent.height + 15
+            radius: window.zenFlat ? 0 : Theme.radius
             color: Theme.shellBackground
+            // LLM PROMPT [end]
         }
 
         Shape {
+            // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Hide notch shoulders when zen is a flat screen panel. 2026-10-12.
+            visible: !window.zenFlat
+            // LLM PROMPT [end]
             x: 0
             width: window.cornerWing
             height: window.cornerWing
@@ -210,6 +236,7 @@ PanelWindow {
         }
 
         Shape {
+            visible: !window.zenFlat
             x: parent.width - width
             width: window.cornerWing
             height: window.cornerWing
@@ -298,7 +325,8 @@ PanelWindow {
             onHoveredChanged: {
                 if (hovered) {
                     closeHoverTimer.stop();
-                } else if (ShellState.expanded) {
+                } else if (ShellState.expanded && ShellState.panel !== "zen") {
+                    // Screen-sized zen stays until Escape / empty click — no hover dismiss.
                     closeHoverTimer.restart();
                 }
             }
@@ -451,11 +479,12 @@ PanelWindow {
             }
             // LLM PROMPT [end]
 
-            // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Host zen panel inside the notch panel host. 2026-10-11.
+            // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Host screen-sized zen panel inside the notch. 2026-10-12.
             ZenPanel {
                 id: zenPanel
 
                 width: parent.width
+                height: parent.height
                 visible: window.displayedPanel === "zen"
             }
             // LLM PROMPT [end]
@@ -532,10 +561,12 @@ PanelWindow {
 
     mask: Region {
         item: notchBody
-        topLeftRadius: 0
-        topRightRadius: 0
-        bottomLeftRadius: Theme.radius
-        bottomRightRadius: Theme.radius
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Flat zen uses a full rectangle mask; notch keeps top flush. 2026-10-12.
+        topLeftRadius: window.zenFlat ? 0 : 0
+        topRightRadius: window.zenFlat ? 0 : 0
+        bottomLeftRadius: window.zenFlat ? 0 : Theme.radius
+        bottomRightRadius: window.zenFlat ? 0 : Theme.radius
+        // LLM PROMPT [end]
     }
 
 }

@@ -2,6 +2,7 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import qs
 
 Singleton {
 	id: root
@@ -57,20 +58,24 @@ Singleton {
 		try {
 			applyPayload(JSON.parse(trimmed));
 		} catch (e) {
-			console.warn("TimerBridge parse error:", e, trimmed);
+			ShellState.logWarn("TimerBridge parse error:", e, trimmed);
 		}
 	}
 
+	// LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Freeze timer subscribe Process during performance mode. 2026-10-12.
 	Process {
 		id: subProc
-		running: true
+		running: !ShellState.performanceMode
 		command: ["timer", "subscribe"]
 		stdout: SplitParser {
 			onRead: line => root.handleLine(line)
 		}
 	}
+	// LLM PROMPT [end]
 
 	function start(duration, label) {
+		if (ShellState.performanceMode)
+			return;
 		const cmd = ["timer", "start", String(duration)];
 		if (label)
 			cmd.push("-l", String(label));
@@ -79,14 +84,20 @@ Singleton {
 	}
 
 	function stop() {
+		if (ShellState.performanceMode)
+			return;
 		Quickshell.execDetached(["timer", "stop"]);
 	}
 
 	function pause() {
+		if (ShellState.performanceMode)
+			return;
 		Quickshell.execDetached(["timer", "pause"]);
 	}
 
 	function resume() {
+		if (ShellState.performanceMode)
+			return;
 		Quickshell.execDetached(["timer", "resume"]);
 		// LLM PROMPT [end]
 	}

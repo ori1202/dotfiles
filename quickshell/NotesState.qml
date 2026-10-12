@@ -1,12 +1,13 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs
 pragma Singleton
 
 Singleton {
     id: root
 
-    readonly property string helper: Quickshell.shellPath("scripts/notes-helper.py")
+    readonly property string helper: Quickshell.shellPath("scripts/notes-helper")
     property var notes: []
     property string activePath: ""
     property string activeText: ""
@@ -26,6 +27,10 @@ Singleton {
     // LLM PROMPT [end]
 
     function refresh() {
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Skip notes list/read/write while performance mode is on. 2026-10-12.
+        if (ShellState.performanceMode)
+            return;
+        // LLM PROMPT [end]
         if (!listProcess.running)
             listProcess.running = true;
     }
@@ -42,7 +47,7 @@ Singleton {
             return;
         lastError = "";
         saveStatus = "Loading…";
-        dateNoteProcess.exec(["python3", helper, "open-date", key]);
+        dateNoteProcess.exec([helper, "open-date", key]);
     }
     // LLM PROMPT [end]
 
@@ -59,7 +64,7 @@ Singleton {
     }
 
     function save(markdown) {
-        if (!activePath)
+        if (!activePath || ShellState.performanceMode)
             return;
         activeText = markdown;
         saveStatus = "Saving…";
@@ -68,20 +73,20 @@ Singleton {
 
     function togglePin(path) {
         if (!pinProcess.running)
-            pinProcess.exec(["python3", helper, "toggle-pin", path]);
+            pinProcess.exec([helper, "toggle-pin", path]);
     }
 
     function deleteNote(path) {
         if (!deleteProcess.running) {
             if (path === activePath)
                 closeNote();
-            deleteProcess.exec(["python3", helper, "delete", path]);
+            deleteProcess.exec([helper, "delete", path]);
         }
     }
 
     Process {
         id: listProcess
-        command: ["python3", root.helper, "list"]
+        command: [root.helper, "list"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
@@ -103,7 +108,7 @@ Singleton {
 
     Process {
         id: createProcess
-        command: ["python3", root.helper, "create"]
+        command: [root.helper, "create"]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {

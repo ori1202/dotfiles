@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.UPower
+import qs
 
 Item {
     id: root
@@ -11,6 +12,10 @@ Item {
     readonly property bool discharging: UPower.displayDevice && UPower.onBattery
 
     function checkBattery() {
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Skip low-battery notify Process while performance mode is on. 2026-10-12.
+        if (ShellState.performanceMode)
+            return;
+        // LLM PROMPT [end]
         if (!discharging || level >= 0.12) {
             alerted = false;
             return;
@@ -34,7 +39,7 @@ Item {
 
     Timer {
         interval: 300000
-        running: true
+        running: !ShellState.performanceMode
         repeat: true
         triggeredOnStart: true
         onTriggered: root.checkBattery()

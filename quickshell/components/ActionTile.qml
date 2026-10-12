@@ -10,12 +10,13 @@ FocusScope {
     property bool active: false
     property bool expandable: false
     property bool expanded: false
+    property bool iconOnly: false
     property string detailAccessibleName: "Show " + title + " options"
 
     signal clicked()
     signal detailClicked()
 
-    implicitHeight: 58
+    implicitHeight: iconOnly ? 40 : 58
     activeFocusOnTab: true
     Keys.onReturnPressed: root.clicked()
     Keys.onEnterPressed: root.clicked()
@@ -39,6 +40,38 @@ FocusScope {
 
     }
 
+    // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Icon-only ActionTile layout for compact control rows. 2026-10-12.
+    Item {
+        anchors.fill: parent
+        anchors.rightMargin: detailButton.visible ? detailButton.width : 0
+        visible: root.iconOnly
+
+        Rectangle {
+            anchors.centerIn: parent
+            width: 28
+            height: 28
+            radius: 14
+            color: root.active ? Qt.rgba(0.12, 0.14, 0.12, 0.14) : Theme.bg1
+
+            ShellText {
+                anchors.centerIn: parent
+                text: root.icon
+                color: root.active ? Theme.bgDim : Theme.muted
+                font.pixelSize: 14
+                font.weight: Font.Bold
+            }
+
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.clicked()
+        }
+
+    }
+    // LLM PROMPT [end]
+
     Row {
         anchors.left: parent.left
         anchors.right: detailButton.visible ? detailButton.left : parent.right
@@ -46,6 +79,7 @@ FocusScope {
         anchors.bottom: parent.bottom
         anchors.margins: 9
         spacing: 8
+        visible: !root.iconOnly
 
         Rectangle {
             anchors.verticalCenter: parent.verticalCenter
@@ -94,6 +128,7 @@ FocusScope {
         anchors.right: detailButton.visible ? detailButton.left : parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        visible: !root.iconOnly
         cursorShape: Qt.PointingHandCursor
         onClicked: root.clicked()
     }
@@ -104,8 +139,8 @@ FocusScope {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: root.expandable ? 31 : 0
-        visible: root.expandable
+        width: root.expandable && !root.iconOnly ? 31 : 0
+        visible: root.expandable && !root.iconOnly
         activeFocusOnTab: visible
         Keys.onReturnPressed: root.detailClicked()
         Keys.onEnterPressed: root.detailClicked()

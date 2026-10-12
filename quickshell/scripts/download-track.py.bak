@@ -59,22 +59,21 @@ def playerctl(*fields: str) -> str:
     return (result.stdout or "").strip() if result.returncode == 0 else ""
 
 
+def is_youtube_music_url(url: str) -> bool:
+    return bool(re.search(r"(?:^https?://)?(?:www\.)?music\.youtube\.com\b", url or "", re.I))
+
+
 def resolve_url(cli_url: str) -> str:
     return normalize_media_url(cli_url.strip() or playerctl("xesam:url"))
 
 
 def normalize_media_url(url: str) -> str:
-    """Prefer a clean youtube.com watch URL for music.youtube.com / youtu.be links."""
+    """Rewrite music.youtube.com watch links to a clean watch URL for yt-dlp."""
     if not url:
         return ""
-    match = re.search(
-        r"(?:music\.)?youtube\.com/watch\?[^#]*\bv=([\w-]{11})|youtu\.be/([\w-]{11})|youtube\.com/shorts/([\w-]{11})",
-        url,
-        re.I,
-    )
+    match = re.search(r"music\.youtube\.com/watch\?[^#]*\bv=([\w-]{11})", url, re.I)
     if match:
-        video_id = match.group(1) or match.group(2) or match.group(3)
-        return f"https://www.youtube.com/watch?v={video_id}"
+        return f"https://www.youtube.com/watch?v={match.group(1)}"
     return url
 
 
@@ -157,7 +156,10 @@ def record(url: str, title: str, artist: str, path: str) -> None:
     save_index(index)
 
 
-def download(url: str, title: str, artist: str) -> dict:
+def download(url: str, title: str, artist: str, *, source_url: str = "") -> dict:
+    if not is_youtube_music_url(source_url or url):
+        return {"ok": False, "error": "not youtube music", "downloaded": False, "path": ""}
+
     if not url:
         return {"ok": False, "error": "no url", "downloaded": False, "path": ""}
 
@@ -221,7 +223,8 @@ def main() -> int:
     parser.add_argument("legacy_url", nargs="?", default="")
     args = parser.parse_args()
 
-    url = resolve_url(args.url or args.legacy_url)
+    source_url = (args.url or args.legacy_url).strip() or playerctl("xesam:url")
+    url = normalize_media_url(source_url)
     title = args.title or playerctl("xesam:title")
     artist = args.artist or playerctl("xesam:artist")
 
@@ -229,7 +232,7 @@ def main() -> int:
         print(json.dumps(status(url, title, artist), ensure_ascii=False))
         return 0
 
-    result = download(url, title, artist)
+    result = download(url, title, artist, source_url=source_url)
     print(json.dumps(result, ensure_ascii=False))
     return 0 if result.get("ok") else 1
 

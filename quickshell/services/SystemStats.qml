@@ -2,6 +2,7 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import qs
 
 Singleton {
 	id: root
@@ -22,24 +23,29 @@ Singleton {
 
 	readonly property string cpuTempText: ready && cpuTemp > 0 ? Math.round(cpuTemp) + "°C" : "--"
 	readonly property string gpuTempText: gpuAvailable ? Math.round(gpuTemp) + "°C" : "--"
-	readonly property string cpuSubtitle: ready
-		? (cpuUsage + "% · " + memPct + "% RAM")
-		: "Reading…"
-	readonly property string gpuSubtitle: gpuAvailable
-		? (gpuUsage + "% · " + gpuMemUsed + "/" + gpuMemTotal + " MiB")
-		: "No GPU sensor"
+	readonly property string cpuSubtitle: ShellState.performanceMode
+		? "Paused"
+		: (ready ? (cpuUsage + "% · " + memPct + "% RAM") : "Reading…")
+	readonly property string gpuSubtitle: ShellState.performanceMode
+		? "Paused"
+		: (gpuAvailable ? (gpuUsage + "% · " + gpuMemUsed + "/" + gpuMemTotal + " MiB") : "No GPU sensor")
 
 	function refresh() {
+		if (ShellState.performanceMode)
+			return;
 		if (!statsProc.running)
 			statsProc.running = true;
 	}
 
+	// LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Stop sys-stats Process polling while performance mode is on. 2026-10-12.
 	Process {
 		id: statsProc
 		command: [Quickshell.shellPath("scripts/sys-stats.sh")]
-		running: true
+		running: !ShellState.performanceMode
 		stdout: SplitParser {
 			onRead: data => {
+				if (ShellState.performanceMode)
+					return;
 				try {
 					const obj = JSON.parse(String(data).trim());
 					root.cpuTemp = Number(obj.cpuTemp) || 0;
@@ -56,7 +62,7 @@ Singleton {
 					root.gpuAvailable = obj.gpuTemp !== null && obj.gpuTemp !== undefined;
 					root.ready = true;
 				} catch (e) {
-					console.warn("SystemStats parse error:", e);
+					ShellState.logWarn("SystemStats parse error:", e);
 				}
 			}
 		}
@@ -64,8 +70,9 @@ Singleton {
 
 	Timer {
 		interval: 2000
-		running: true
+		running: !ShellState.performanceMode
 		repeat: true
 		onTriggered: root.refresh()
 	}
+	// LLM PROMPT [end]
 }

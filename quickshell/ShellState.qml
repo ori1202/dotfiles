@@ -11,7 +11,9 @@ Singleton {
         "launcher": 410,
         "clipboard": 365,
         "todo": 420,
-        "notes": 500,
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Widen notes panel for merged space checklist. 2026-10-12.
+        "notes": 520,
+        // LLM PROMPT [end]
         "theme": 420,
         "wallpaper": 500,
         "capture": 395,
@@ -24,8 +26,8 @@ Singleton {
         "timer": 340
         // LLM PROMPT [end]
         ,
-        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Register zen panel size in ShellState. 2026-10-11.
-        "zen": 380
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Zen width fallback; Notch sizes it to the screen. 2026-10-12.
+        "zen": 1200
         // LLM PROMPT [end]
     })
     readonly property var panelHeights: ({
@@ -33,7 +35,9 @@ Singleton {
         "launcher": 290,
         "clipboard": 80,
         "todo": 87,
-        "notes": 430,
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Raise notes panel height for space checklist. 2026-10-12.
+        "notes": 520,
+        // LLM PROMPT [end]
         "theme": 252,
         "wallpaper": 382,
         "capture": 208,
@@ -46,8 +50,8 @@ Singleton {
         "timer": 250
         // LLM PROMPT [end]
         ,
-        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Register zen panel height in ShellState. 2026-10-11.
-        "zen": 320
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Zen height fallback; Notch sizes it to the screen. 2026-10-12.
+        "zen": 900
         // LLM PROMPT [end]
     })
     property string panel: "clock"
@@ -60,6 +64,40 @@ Singleton {
     // LLM PROMPT [end]
     // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Persist YouTube Music auto-download preference. 2026-10-11.
     property alias musicAutoDownload: persistence.musicAutoDownload
+    // LLM PROMPT [end]
+    // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Performance mode freezes shell/daemon IO for low-latency gaming. 2026-10-12.
+    property alias performanceMode: persistence.performanceMode
+
+    function setPerformanceMode(on) {
+        const next = !!on;
+        if (performanceMode === next)
+            return;
+        performanceMode = next;
+        Quickshell.execDetached(["zen", next ? "perf-on" : "perf-off"]);
+        Quickshell.execDetached(["space", next ? "perf-on" : "perf-off"]);
+    }
+
+    function togglePerformanceMode() {
+        setPerformanceMode(!performanceMode);
+    }
+
+    function logWarn(a, b, c) {
+        if (performanceMode)
+            return;
+        if (c !== undefined)
+            console.warn(a, b, c);
+        else if (b !== undefined)
+            console.warn(a, b);
+        else
+            console.warn(a);
+    }
+
+    Component.onCompleted: {
+        if (performanceMode) {
+            Quickshell.execDetached(["zen", "perf-on"]);
+            Quickshell.execDetached(["space", "perf-on"]);
+        }
+    }
     // LLM PROMPT [end]
 
     function loadTodos() {
@@ -78,12 +116,14 @@ Singleton {
                 "notes": typeof todo.notes === "string" ? todo.notes : ""
             }));
         } catch (error) {
-            console.warn("Unable to load todos.json:", error);
+            root.logWarn("Unable to load todos.json:", error);
         }
     }
 
     function saveTodos(next) {
         todos = next;
+        if (performanceMode)
+            return;
         todoFile.setText(JSON.stringify(next, null, 2) + "\n");
     }
 
@@ -248,6 +288,9 @@ Singleton {
         // LLM PROMPT [end]
         // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Auto-download YouTube Music tracks when enabled. 2026-10-11.
         property bool musicAutoDownload: false
+        // LLM PROMPT [end]
+        // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Persist performance-mode preference. 2026-10-12.
+        property bool performanceMode: false
         // LLM PROMPT [end]
 
         reloadableId: "vyeos-notch-state"

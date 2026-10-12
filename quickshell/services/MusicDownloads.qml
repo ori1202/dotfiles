@@ -9,7 +9,7 @@ import qs
 Singleton {
 	id: root
 
-	readonly property string helper: Quickshell.shellPath("scripts/download-track.py")
+	readonly property string helper: Quickshell.shellPath("scripts/download-track")
 
 	function playerUrl(player) {
 		if (!player || !player.metadata)
@@ -19,7 +19,7 @@ Singleton {
 	}
 
 	function isYoutubeMusicUrl(url) {
-		return /(?:music\.)?youtube\.com|youtu\.be/i.test(String(url || ""));
+		return /(?:^https?:\/\/)?(?:www\.)?music\.youtube\.com\b/i.test(String(url || ""));
 	}
 
 	function isFirefoxPlayer(player) {
@@ -60,10 +60,7 @@ Singleton {
 	readonly property string trackTitle: player ? (player.trackTitle || "") : ""
 	readonly property string trackArtist: player ? (player.trackArtist || "") : ""
 	readonly property bool isYoutubeMusic: root.isYoutubeMusicUrl(trackUrl)
-	readonly property bool canDownload: {
-		const url = String(trackUrl || "");
-		return !!player && (/^https?:\/\//i.test(url) || root.isYoutubeMusic);
-	}
+	readonly property bool canDownload: !!player && root.isYoutubeMusic && !!trackUrl
 
 	property bool downloaded: false
 	property string downloadedPath: ""
@@ -84,10 +81,12 @@ Singleton {
 	}
 
 	function refresh() {
-		if (statusProcess.running)
+		// LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Skip music status/download Processes in performance mode. 2026-10-12.
+		if (ShellState.performanceMode || statusProcess.running)
 			return;
+		// LLM PROMPT [end]
 		statusProcess.exec([
-			"python3", helper, "status",
+			helper, "status",
 			"--url", trackUrl,
 			"--title", trackTitle,
 			"--artist", trackArtist
@@ -95,12 +94,12 @@ Singleton {
 	}
 
 	function download() {
-		if (downloading || downloaded || !canDownload)
+		if (ShellState.performanceMode || downloading || downloaded || !canDownload)
 			return;
 		downloading = true;
 		statusText = "Downloading…";
 		downloadProcess.exec([
-			"python3", helper, "download",
+			helper, "download",
 			"--url", trackUrl,
 			"--title", trackTitle,
 			"--artist", trackArtist
@@ -108,7 +107,7 @@ Singleton {
 	}
 
 	function maybeAutoDownload() {
-		if (!autoDownload || !isYoutubeMusic || !canDownload || downloaded || downloading)
+		if (ShellState.performanceMode || !autoDownload || !isYoutubeMusic || !canDownload || downloaded || downloading)
 			return;
 		if (trackKey === lastAutoKey || !trackUrl)
 			return;
@@ -118,7 +117,7 @@ Singleton {
 
 	Connections {
 		target: root.player
-		enabled: !!root.player
+		enabled: !!root.player && !ShellState.performanceMode
 		function onTrackTitleChanged() { root.refresh(); }
 		function onTrackArtistChanged() { root.refresh(); }
 		function onMetadataChanged() { root.refresh(); }
@@ -127,6 +126,7 @@ Singleton {
 
 	Connections {
 		target: Mpris.players
+		enabled: !ShellState.performanceMode
 		function onValuesChanged() { root.refresh(); }
 	}
 
@@ -178,6 +178,9 @@ Singleton {
 		}
 	}
 
-	Component.onCompleted: refresh()
+	Component.onCompleted: {
+		if (!ShellState.performanceMode)
+			refresh();
+	}
 }
 // LLM PROMPT [end]

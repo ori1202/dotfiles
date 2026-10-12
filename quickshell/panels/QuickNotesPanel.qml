@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs
 import qs.components
+import qs.services
 import "../MarkdownBlocks.js" as Markdown
 
 FocusScope {
@@ -16,6 +17,12 @@ FocusScope {
     property bool confirmingDelete: false
     property bool paletteOpen: false
     readonly property bool editorMode: NotesState.activePath.length > 0
+    // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Space checklist height when merged into notes list. 2026-10-12.
+    property bool spaceEditing: false
+    readonly property int spaceSectionHeight: (spaceEditing ? 96 : 54)
+        + Math.max(1, SpaceBridge.tasks.length) * (spaceEditing ? 38 : 34)
+        + 8
+    // LLM PROMPT [end]
     readonly property var paletteNotes: NotesState.notes.filter((note) => {
         const query = paletteInput.text.trim().toLowerCase();
         const searchable = String(note.searchText || note.title || "").toLowerCase();
@@ -289,8 +296,8 @@ FocusScope {
         copiedStatusReset.restart();
     }
 
-    implicitWidth: 472
-    implicitHeight: 430
+    implicitWidth: 492
+    implicitHeight: 520
 
     Keys.onPressed: (event) => {
         if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_N) {
@@ -393,7 +400,7 @@ FocusScope {
             ShellText {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                text: root.editorMode ? "‹  Quick Notes" : "Quick Notes"
+                text: root.editorMode ? "‹  Notes · Space" : "Notes · Space"
                 font.pixelSize: 14
                 font.weight: Font.Bold
 
@@ -500,11 +507,230 @@ FocusScope {
 
             Column {
                 anchors.fill: parent
+                spacing: 10
+
+                // LLM PROMPT [start](YET TO BE CLASSIFIED BY A CERTIFYING AUTHORITY) description: Daily space checklist merged into the notes panel. 2026-10-12.
+                Rectangle {
+                    width: parent.width
+                    height: root.spaceSectionHeight
+                    radius: Theme.radius
+                    color: Theme.bg0
+                    border.width: 1
+                    border.color: !SpaceBridge.enabled
+                        ? Theme.mutedDark
+                        : (SpaceBridge.unlocked ? Theme.primary : Theme.red)
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 8
+
+                        Row {
+                            width: parent.width
+                            spacing: 8
+
+                            Column {
+                                width: parent.width - 136
+                                spacing: 2
+
+                                ShellText {
+                                    text: SpaceBridge.enabled
+                                        ? (SpaceBridge.unlocked ? "Space clear — games unlocked" : "Space locked — finish today's checklist")
+                                        : "Space gate off"
+                                    font.pixelSize: 12
+                                    font.weight: Font.Bold
+                                    elide: Text.ElideRight
+                                    width: parent.width
+                                }
+
+                                ShellText {
+                                    text: SpaceBridge.done + "/" + SpaceBridge.total + " done · resets " + (SpaceBridge.day || "daily")
+                                    color: Theme.muted
+                                    font.pixelSize: 9
+                                }
+                            }
+
+                            IconButton {
+                                width: 40
+                                height: 28
+                                icon: root.spaceEditing ? "OK" : "✎"
+                                accessibleName: root.spaceEditing ? "Finish editing space tasks" : "Edit space tasks"
+                                backgroundColor: root.spaceEditing ? Theme.primary : Theme.bgDim
+                                foregroundColor: root.spaceEditing ? Theme.bgDim : Theme.foreground
+                                onClicked: root.spaceEditing = !root.spaceEditing
+                            }
+
+                            IconButton {
+                                width: 40
+                                height: 28
+                                icon: SpaceBridge.enabled ? "ON" : "OFF"
+                                accessibleName: "Toggle space gate"
+                                backgroundColor: SpaceBridge.enabled ? Theme.primary : Theme.bgDim
+                                foregroundColor: SpaceBridge.enabled ? Theme.bgDim : Theme.foreground
+                                onClicked: SpaceBridge.toggle()
+                            }
+
+                            IconButton {
+                                width: 40
+                                height: 28
+                                icon: "↺"
+                                accessibleName: "Reset space checklist"
+                                backgroundColor: Theme.bgDim
+                                onClicked: SpaceBridge.reset()
+                            }
+                        }
+
+                        Repeater {
+                            model: SpaceBridge.tasks
+
+                            Rectangle {
+                                required property var modelData
+                                width: parent.width
+                                height: root.spaceEditing ? 34 : 30
+                                radius: Theme.radiusSmall
+                                color: modelData.done ? Theme.primaryContainer : Theme.bgDim
+
+                                Row {
+                                    anchors.fill: parent
+                                    anchors.margins: 6
+                                    spacing: 8
+
+                                    Rectangle {
+                                        width: 16
+                                        height: 16
+                                        radius: 4
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        visible: !root.spaceEditing
+                                        color: modelData.done ? Theme.primary : "transparent"
+                                        border.width: 1
+                                        border.color: modelData.done ? Theme.primary : Theme.mutedDark
+
+                                        ShellText {
+                                            anchors.centerIn: parent
+                                            text: modelData.done ? "✓" : ""
+                                            color: Theme.bgDim
+                                            font.pixelSize: 10
+                                            font.weight: Font.Bold
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            anchors.margins: -4
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: SpaceBridge.toggleTask(modelData.id)
+                                        }
+                                    }
+
+                                    TextInput {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width - (root.spaceEditing ? 44 : 28)
+                                        text: modelData.label || modelData.id
+                                        readOnly: !root.spaceEditing
+                                        color: modelData.done && !root.spaceEditing ? Theme.muted : Theme.foreground
+                                        selectionColor: Theme.primaryContainer
+                                        selectedTextColor: Theme.foreground
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: 10
+                                        clip: true
+                                        selectByMouse: root.spaceEditing
+                                        onEditingFinished: {
+                                            if (!root.spaceEditing)
+                                                return;
+                                            const next = text.trim();
+                                            if (next && next !== (modelData.label || ""))
+                                                SpaceBridge.renameTask(modelData.id, next);
+                                            else
+                                                text = modelData.label || modelData.id;
+                                        }
+                                        Keys.onReturnPressed: { editingFinished(); focus = false; }
+                                        Keys.onEnterPressed: { editingFinished(); focus = false; }
+                                    }
+
+                                    IconButton {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: 28
+                                        height: 28
+                                        visible: root.spaceEditing
+                                        icon: "✕"
+                                        accessibleName: "Remove space task"
+                                        backgroundColor: Theme.bg0
+                                        onClicked: SpaceBridge.removeTask(modelData.id)
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    enabled: !root.spaceEditing
+                                    z: -1
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: SpaceBridge.toggleTask(modelData.id)
+                                }
+                            }
+                        }
+
+                        Row {
+                            width: parent.width
+                            spacing: 6
+                            visible: root.spaceEditing
+
+                            Rectangle {
+                                width: parent.width - 40
+                                height: 30
+                                radius: Theme.radiusSmall
+                                color: Theme.bgDim
+
+                                TextInput {
+                                    id: notesSpaceAddInput
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 8
+                                    anchors.rightMargin: 8
+                                    verticalAlignment: TextInput.AlignVCenter
+                                    color: Theme.foreground
+                                    selectionColor: Theme.primaryContainer
+                                    selectedTextColor: Theme.foreground
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: 10
+                                    clip: true
+
+                                    ShellText {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "New checklist item…"
+                                        visible: !parent.text
+                                        color: Theme.mutedDark
+                                        font.pixelSize: 10
+                                    }
+
+                                    Keys.onReturnPressed: {
+                                        SpaceBridge.addTask(text);
+                                        clear();
+                                    }
+                                    Keys.onEnterPressed: {
+                                        SpaceBridge.addTask(text);
+                                        clear();
+                                    }
+                                }
+                            }
+
+                            IconButton {
+                                width: 34
+                                height: 30
+                                icon: "+"
+                                accessibleName: "Add space task"
+                                backgroundColor: Theme.bgDim
+                                onClicked: {
+                                    SpaceBridge.addTask(notesSpaceAddInput.text);
+                                    notesSpaceAddInput.clear();
+                                }
+                            }
+                        }
+                    }
+                }
+                // LLM PROMPT [end]
 
                 ListView {
                     id: notesList
                     width: parent.width
-                    height: parent.height
+                    height: parent.height - root.spaceSectionHeight - 10
                     model: NotesState.notes
                     currentIndex: root.recentIndex
                     spacing: 3
